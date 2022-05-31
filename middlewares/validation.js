@@ -63,6 +63,13 @@ export const validateLogin = celebrate({
   }),
 });
 
+const validateURL = (value, helpers) => {
+  if (validator.isURL(value)) {
+    return value;
+  }
+  return helpers.message('Cсылка некорректная');
+};
+
 export const validateMovie = celebrate({
   [Segments.BODY]: Joi.object().keys({
     country: Joi.string().required(),
@@ -70,18 +77,9 @@ export const validateMovie = celebrate({
     duration: Joi.number().required(),
     year: Joi.string().required(),
     description: Joi.string().required(),
-    image: Joi.string().required().uri().messages({
-      'any.required': 'Cсылка не указана',
-      'string.uri': 'Cсылка некорректная',
-    }),
-    trailerLink: Joi.string().required().uri().messages({
-      'any.required': 'Cсылка не указана',
-      'string.uri': 'Cсылка некорректная',
-    }),
-    thumbnail: Joi.string().required().uri().messages({
-      'any.required': 'Cсылка не указана',
-      'string.uri': 'Cсылка некорректная',
-    }),
+    image: Joi.string().required().custom(validateURL),
+    trailerLink: Joi.string().required().custom(validateURL),
+    thumbnail: Joi.string().required().custom(validateURL),
     movieId: Joi.number().required(),
     nameRU: Joi.string().required(),
     nameEN: Joi.string().required(),

@@ -51,6 +51,8 @@ export const updateProfile = (req, res, next) => {
     .catch((err) => {
       if (err.name === 'ValidationError') {
         next(new ValidationError('Переданы некорректные данные в методы обновления профиля'));
+      } else if (err.codeName === 'DuplicateKey') {
+        next(new ErrorConflict());
       } else {
         next(err);
       }

@@ -58,14 +58,20 @@ export const createMovie = (req, res, next) => {
 export const deleteMovie = (req, res, next) => {
   movieModel.findById(req.params.id)
     .orFail(() => new ErrorNotFound('Фильм не найден'))
-    .then(({ owner }) => {
-      if (owner.toString() === req.user._id) {
-        movieModel.findByIdAndDelete(req.params.id).then(() => {
-          res.send({ message: 'Фильм удалён' });
-        });
-      } else {
-        throw new Forbidden('Недостаточно прав');
+    .then((movie) => {
+      if (movie.owner.toString() === req.user._id) {
+        // movieModel.findByIdAndDelete(req.params.id).then(() => {
+        //   res.send({ message: 'Фильм удалён' });
+        // });
+        return movie.remove()
+          .then(() => res.status(200).send({ message: 'Фильм удален' }));
       }
+      throw new Forbidden('Недостаточно прав');
     })
-    .catch(next);
+    .catch((err) => {
+      if (err.kind === 'ObjectId') {
+        next(new ValidationError('Невалидный id'));
+      }
+      next(err);
+    });
 };

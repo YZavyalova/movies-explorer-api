@@ -15,10 +15,16 @@ import auth from './middlewares/auth.js';
 import ErrorNotFound from './errors/ErrorNotFound.js';
 import { requestLogger, errorLogger } from './middlewares/logger.js';
 
-export const { PORT = 3000, NODE_ENV, JWT_SECRET } = process.env;
+export const {
+  PORT = 3000,
+  NODE_ENV,
+  JWT_SECRET,
+  BD,
+} = process.env;
+
 const app = express();
 
-mongoose.connect('mongodb://localhost:27017/bitfilmsdb');
+mongoose.connect(NODE_ENV === 'production' ? BD : 'mongodb://localhost:27017/bitfilmsdb');
 
 app.use(cors({
   origin: [
